@@ -16,12 +16,24 @@ class RoleController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
         if (!auth()->user()->hasRole(['admin', 'manager'])) {
             abort(403, 'Nincs jogosultságod megtekinteni ezt az oldalt.');
         }
-        $roles = Role::orderBy('name')->paginate(10);
+        $query = \Spatie\Permission\Models\Role::query();
+        if ($request->filled('search')) {
+            $search = $request->input('search');
+            $query->where(function($q) use ($search) {
+                $q->where('name', 'like', "%$search%")
+                  ->orWhere('description', 'like', "%$search%")
+                  ->orWhereHas('permissions', function($q2) use ($search) {
+                      $q2->where('name', 'like', "%$search%")
+                  ;
+                  });
+            });
+        }
+        $roles = $query->orderBy('name')->paginate(10);
         return view('roles.index', compact('roles'));
     }
 

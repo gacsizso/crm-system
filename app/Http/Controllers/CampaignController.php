@@ -29,6 +29,20 @@ class CampaignController extends Controller
                 $q->where('groups.id', $request->group_id);
             });
         }
+        if ($request->filled('search')) {
+            $search = $request->input('search');
+            $query->where(function($q) use ($search) {
+                $q->where('subject', 'like', "%$search%")
+                  ->orWhereHas('groups', function($q2) use ($search) {
+                      $q2->where('name', 'like', "%$search%")
+                  ;
+                  })
+                  ->orWhereHas('creator', function($q3) use ($search) {
+                      $q3->where('name', 'like', "%$search%")
+                  ;
+                  });
+            });
+        }
         $campaigns = $query->orderBy('created_at', 'desc')->paginate(10);
         return view('campaigns.index', compact('campaigns'));
     }

@@ -97,6 +97,8 @@ class ContactController extends Controller
         $user = auth()->user();
         if ($user->hasRole(['admin', 'manager']) && $request->filled('user_id')) {
             $validated['user_id'] = $request->input('user_id');
+        } else {
+            $validated['user_id'] = $user->id;
         }
         $contact->update($validated);
         $contact->clients()->sync($request->input('clients', []));

@@ -32,6 +32,17 @@ class TaskController extends Controller
         if ($request->has('mine') && auth()->check()) {
             $query->where('assigned_to', auth()->id());
         }
+        if ($request->filled('search')) {
+            $search = $request->input('search');
+            $query->where(function($q) use ($search) {
+                $q->where('name', 'like', "%$search%")
+                  ->orWhere('status', 'like', "%$search%")
+                  ->orWhereHas('project', function($q2) use ($search) {
+                      $q2->where('name', 'like', "%$search%")
+                  ;
+                  });
+            });
+        }
         $tasks = $query->orderBy('due_date')->paginate(10);
         return view('tasks.index', compact('tasks'));
     }

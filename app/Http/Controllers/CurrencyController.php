@@ -17,12 +17,21 @@ class CurrencyController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
         if (!auth()->user()->hasRole(['admin', 'manager'])) {
             abort(403, 'Nincs jogosultságod megtekinteni ezt az oldalt.');
         }
-        $currencies = Currency::orderBy('name')->paginate(10);
+        $query = \App\Models\Currency::query();
+        if ($request->filled('search')) {
+            $search = $request->input('search');
+            $query->where(function($q) use ($search) {
+                $q->where('name', 'like', "%$search%")
+                  ->orWhere('code', 'like', "%$search%")
+                ;
+            });
+        }
+        $currencies = $query->orderBy('name')->paginate(10);
         return view('currencies.index', compact('currencies'));
     }
 

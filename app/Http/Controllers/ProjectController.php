@@ -18,9 +18,18 @@ class ProjectController extends Controller
     public function index(Request $request)
     {
         $status = $request->query('status');
+        $search = $request->query('search');
         $query = Project::with('clients');
         if ($status) {
             $query->where('status', $status);
+        }
+        if ($search) {
+            $query->where(function($q) use ($search) {
+                $q->where('name', 'like', "%$search%")
+                  ->orWhere('description', 'like', "%$search%")
+                  ->orWhere('status', 'like', "%$search%")
+                ;
+            });
         }
         $projects = $query->orderBy('created_at', 'desc')->paginate(10);
         $statuses = [
@@ -90,6 +99,7 @@ class ProjectController extends Controller
     public function edit(string $id)
     {
         $project = Project::with('clients')->findOrFail($id);
+        $this->authorize('update', $project);
         $clients = Client::orderBy('name')->get();
         $contacts = Contact::orderBy('name')->get();
         $groups = Group::orderBy('name')->get();
@@ -103,6 +113,8 @@ class ProjectController extends Controller
      */
     public function update(Request $request, string $id)
     {
+        $project = Project::findOrFail($id);
+        $this->authorize('update', $project);
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
@@ -120,7 +132,6 @@ class ProjectController extends Controller
             'clients' => 'nullable|array',
             'clients.*' => 'exists:clients,id',
         ]);
-        $project = Project::findOrFail($id);
         $project->update($validated);
         if ($request->has('clients')) {
             $project->clients()->sync($validated['clients']);

@@ -25,6 +25,9 @@
         </div>
     </div>
     <h2 class="mt-4">Kapcsolattartók</h2>
+    @can('assignContact', $client)
+    <a href="{{ route('client-contacts.index') }}" class="btn btn-outline-secondary mb-2">Kapcsolattartók hozzárendelése ehhez az ügyfélhez</a>
+    @endcan
     <a href="{{ route('contacts.create', ['client_id' => $client->id]) }}" class="btn btn-primary mb-2">Új kapcsolattartó hozzáadása ehhez az ügyfélhez</a>
     <table class="table table-bordered">
         <thead>

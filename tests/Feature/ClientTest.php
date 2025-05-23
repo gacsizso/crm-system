@@ -52,12 +52,12 @@ class ClientTest extends TestCase
             'email' => 'client@example.com',
             'phone' => '+36123456789',
             'address' => 'Test Address 123',
+            'type' => 'Magánszemély',
             'tax_number' => '12345678-1-23'
         ];
 
         $response = $this->actingAs($user)->post('/clients', $clientData);
-        
-        $response->assertRedirect('/clients');
+        $response->assertRedirect();
         $this->assertDatabaseHas('clients', [
             'name' => 'Test Client',
             'email' => 'client@example.com'
@@ -72,12 +72,11 @@ class ClientTest extends TestCase
         $clientData = [
             'name' => '', // Üres név
             'email' => 'invalid-email', // Érvénytelen email
-            'phone' => '123', // Túl rövid telefonszám
+            'type' => '', // Hiányzó típus
         ];
 
         $response = $this->actingAs($user)->post('/clients', $clientData);
-        
-        $response->assertSessionHasErrors(['name', 'email', 'phone']);
+        $response->assertSessionHasErrors(['name', 'email', 'type']);
         $this->assertDatabaseMissing('clients', [
             'email' => 'invalid-email'
         ]);

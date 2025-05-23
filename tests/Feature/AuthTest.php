@@ -78,11 +78,12 @@ class AuthTest extends TestCase
     {
         $user = User::factory()->create();
         $user->assignRole($this->userRole);
+        $client = \App\Models\Client::factory()->create();
 
         $response = $this->actingAs($user)->get('/clients/create');
         $response->assertStatus(200); // Mivel csak create jogosultsága van
 
-        $response = $this->actingAs($user)->get('/clients/1/edit');
+        $response = $this->actingAs($user)->get("/clients/{$client->id}/edit");
         $response->assertStatus(403); // Nincs edit jogosultsága
     }
 
@@ -90,11 +91,12 @@ class AuthTest extends TestCase
     {
         $admin = User::factory()->create();
         $admin->assignRole($this->adminRole);
+        $client = \App\Models\Client::factory()->create();
 
         $response = $this->actingAs($admin)->get('/clients/create');
         $response->assertStatus(200);
 
-        $response = $this->actingAs($admin)->get('/clients/1/edit');
+        $response = $this->actingAs($admin)->get("/clients/{$client->id}/edit");
         $response->assertStatus(200);
     }
 

@@ -20,46 +20,58 @@ class NotificationService
 
     public function notifyClientCreated(User $user, $client): Notification
     {
-        return $this->create(
+        $notification = $this->create(
             $user,
             'client_created',
             'Új ügyfél létrehozva',
-            "A(z) {$client->name} ügyfél sikeresen létrejött.",
+            "A {$client->name} ügyfél sikeresen létrejött.",
             route('clients.show', $client)
         );
+        // E-mail notification küldése
+        $user->notify(new \App\Notifications\ClientCreatedNotification($client));
+        return $notification;
     }
 
     public function notifyTaskAssigned(User $user, $task): Notification
     {
-        return $this->create(
+        $notification = $this->create(
             $user,
             'task_assigned',
             'Új feladat hozzárendelve',
-            "A(z) {$task->title} feladatot hozzárendelték hozzád.",
+            "A {$task->title} feladat hozzád lett rendelve.",
             route('tasks.show', $task)
         );
+        // E-mail notification küldése
+        $user->notify(new \App\Notifications\TaskAssignedNotification($task));
+        return $notification;
     }
 
     public function notifyProjectUpdated(User $user, $project): Notification
     {
-        return $this->create(
+        $notification = $this->create(
             $user,
             'project_updated',
             'Projekt frissítve',
             "A(z) {$project->name} projekt frissítve lett.",
             route('projects.show', $project)
         );
+        // E-mail notification küldése
+        $user->notify(new \App\Notifications\ProjectUpdatedNotification($project));
+        return $notification;
     }
 
     public function notifyDeadlineApproaching(User $user, $task): Notification
     {
-        return $this->create(
+        $notification = $this->create(
             $user,
             'deadline_approaching',
             'Közelgő határidő',
             "A(z) {$task->title} feladat határideje közeledik.",
             route('tasks.show', $task)
         );
+        // E-mail notification küldése
+        $user->notify(new \App\Notifications\DeadlineApproachingNotification($task));
+        return $notification;
     }
 
     public function getUnreadCount(User $user): int

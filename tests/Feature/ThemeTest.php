@@ -44,7 +44,7 @@ class ThemeTest extends TestCase
         $response = $this->actingAs($user)->get('/dashboard');
         
         $response->assertStatus(200);
-        $response->assertSee('localStorage.setItem(\'theme\',');
+        $this->assertStringContainsString('localStorage.setItem(\'theme\',', $response->getContent());
     }
 
     public function test_theme_toggle_button_exists()
@@ -54,8 +54,8 @@ class ThemeTest extends TestCase
         $response = $this->actingAs($user)->get('/dashboard');
         
         $response->assertStatus(200);
-        $response->assertSee('id="themeToggle"');
-        $response->assertSee('bi-moon');
+        $this->assertStringContainsString('id="themeToggle"', $response->getContent());
+        $this->assertStringContainsString('bi-moon', $response->getContent());
     }
 
     public function test_theme_affects_all_components()

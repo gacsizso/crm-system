@@ -355,6 +355,23 @@
         .theme-dark .notification-item:hover {
             background: #232b3e !important;
         }
+        /* Sticky table header */
+        .table thead th {
+            position: sticky;
+            top: 0;
+            background: #fff;
+            z-index: 2;
+        }
+        .theme-dark .table thead th {
+            background: #232b3e;
+        }
+        /* Hosszú szövegek vágása */
+        .truncate {
+            max-width: 180px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
     </style>
 </head>
 <body>
@@ -362,6 +379,21 @@
         $hideSidebar = in_array(Route::currentRouteName(), ['login', 'register']);
         $user = Auth::user();
     @endphp
+    <!-- TOAST üzenetek -->
+    <div aria-live="polite" aria-atomic="true" class="position-fixed top-0 end-0 p-3" style="z-index: 2000; min-width: 320px;">
+        @foreach (['success', 'error', 'warning', 'info', 'status'] as $msg)
+            @if(session($msg))
+                <div class="toast align-items-center text-bg-{{ $msg == 'error' ? 'danger' : ($msg == 'status' ? 'success' : $msg) }} border-0 mb-2 show" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="4000">
+                    <div class="d-flex">
+                        <div class="toast-body">
+                            {{ session($msg) }}
+                        </div>
+                        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Bezárás"></button>
+                    </div>
+                </div>
+            @endif
+        @endforeach
+    </div>
     @if(!$hideSidebar)
     <div class="sidebar">
         <div class="sidebar-header">
@@ -538,6 +570,17 @@
             setTheme(current === 'dark' ? 'light' : 'dark');
         });
     });
+    </script>
+    @stack('scripts')
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var toastElList = [].slice.call(document.querySelectorAll('.toast'));
+            toastElList.forEach(function(toastEl) {
+                var toast = new bootstrap.Toast(toastEl);
+                toast.show();
+            });
+        });
     </script>
 </body>
 </html> 

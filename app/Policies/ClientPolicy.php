@@ -22,4 +22,12 @@ class ClientPolicy
     {
         return $user->hasRole(['admin', 'manager']);
     }
+
+    /**
+     * Determine if the user can assign contacts to the client.
+     */
+    public function assignContact(User $user, Client $client)
+    {
+        return $user->hasRole(['admin', 'manager']);
+    }
 } 

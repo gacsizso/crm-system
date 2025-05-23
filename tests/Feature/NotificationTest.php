@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use Tests\TestCase;
 use App\Models\User;
 use App\Models\Notification;
+use App\Models\Task;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
 
@@ -117,7 +118,8 @@ class NotificationTest extends TestCase
         $clientData = [
             'name' => 'Test Client',
             'email' => 'client@example.com',
-            'phone' => '+36123456789'
+            'phone' => '+36123456789',
+            'type' => 'cég',
         ];
 
         $response = $this->actingAs($user)->post('/clients', $clientData);

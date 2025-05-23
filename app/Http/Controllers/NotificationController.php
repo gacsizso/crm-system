@@ -25,7 +25,10 @@ class NotificationController extends Controller
 
     public function markAsRead($id)
     {
-        $notification = auth()->user()->notifications()->findOrFail($id);
+        $notification = \App\Models\Notification::findOrFail($id);
+        if ($notification->user_id !== auth()->id()) {
+            abort(403, 'Nincs jogosultságod ehhez az értesítéshez.');
+        }
         $notification->markAsRead();
 
         return response()->json(['success' => true]);
